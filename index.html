@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de Inteligencias Múltiples</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #E3FDF5, #FFE6FA);
+      margin: 0;
+      padding: 20px;
+      color: #003446;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    h1.title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #003446;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    .title-icon {
+      width: 80px;
+      height: 100px;
+      margin: 0 20px;
+    }
+    .title-icon1 {
+      width: 110px;
+      height: 100px;
+      margin: 0 15px;
+    }
+    .question {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #e0f7fa;
+      border-left: 5px solid #007d8d;
+      border-radius: 8px;
+      transition: transform 0.2s;
+    }
+
+    .question:hover {
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(0, 125, 141, 0.2);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: #005265;
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+      transform: scale(1.1);
+      accent-color: #00b6be;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto;
+      padding: 14px 32px;
+      font-size: 1.1rem;
+      background-color: #007d8d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #005265;
+      transform: translateY(-2px);
+    }
+
+    #results {
+      margin-top: 50px;
+      padding: 24px;
+      background-color: #e0f2f1;
+      border-left: 6px solid #00b6be;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      color: #003446;
+      line-height: 1.6;
+    }
+
+    .chart-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .chart-box {
+      width: 48%;
+      margin-bottom: 30px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .chart-box {
+        width: 100%;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .intelligence-name {
+      font-weight: bold;
+      color: #007d8d;
+    }
+
+    .intelligence-description {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    
+    .instructions {
+      background-color: #f0f8ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      border-left: 5px solid #4b86b4;
+    }
+    
+    .instructions h3 {
+      margin-top: 0;
+      color: #2a4d69;
+    }
+    
+    .instructions p {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">
+      Test de Inteligencias Múltiples
+    </h1>
+    
+    <div class="instructions">
+      <h3>Instrucciones:</h3>
+      <p>Por favor responde todas las preguntas seleccionando "Sí" o "No" según tu caso.</p>
+      <p>Al finalizar, haz clic en "Calcular Resultados" para obtener tu perfil de inteligencias múltiples.</p>
+      <p>Recuerda que no hay respuestas correctas o incorrectas, solo reflejan tus preferencias y habilidades naturales.</p>
+    </div>
+    
+    <form id="testForm"></form>
+    <button onclick="calcularResultados()">Calcular Resultados</button>
+    <div id="results"></div>
+    <div class="chart-container" id="charts"></div>
+    
+  </div>
+
+  <script>
+    const preguntas = [
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Prefiero hacer un mapa que explicarle a alguien como tiene que llegar.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Si estoy enojado(a) o contento (a) generalmente sé exactamente por qué.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Musical (E)
+      { tipo: 'musical', texto: 'Sé tocar (o antes sabía tocar) un instrumento musical.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Musical (E)
+      { tipo: 'musical', texto: 'Asocio la música con mis estados de ánimo.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Puedo sumar o multiplicar mentalmente con mucha rapidez.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Puedo ayudar a un amigo a manejar sus sentimientos porque yo lo pude hacer antes en relación a sentimientos parecidos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Me gusta trabajar con calculadoras y computadores.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Corporal-kinestésica (D)
+      { tipo: 'corporal-kinestésica', texto: 'Aprendo rápido a bailar un ritmo nuevo.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lingüística (A)
+      { tipo: 'lingüística', texto: 'No me es difícil decir lo que pienso en el curso de una discusión o debate.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lingüística (A)
+      { tipo: 'lingüística', texto: 'Disfruto de una buena charla, discurso o sermón.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Siempre distingo el norte del sur, esté donde esté.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Interpersonal (G)
+      { tipo: 'interpersonal', texto: 'Me gusta reunir grupos de personas en una fiesta o en un evento especial.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Musical (E)
+      { tipo: 'musical', texto: 'La vida me parece vacía sin música.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Siempre entiendo los gráficos que vienen en las instrucciones de equipos o instrumentos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Me gusta hacer rompecabezas y entretenerme con juegos electrónicos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Corporal-kinestésica (D)
+      { tipo: 'corporal-kinestésica', texto: 'Me fue fácil aprender a andar en bicicleta (o patines).', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Me enojo cuando oigo una discusión o una afirmación que parece ilógica.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Interpersonal (G)
+      { tipo: 'interpersonal', texto: 'Soy capaz de convencer a otros que sigan mis planes.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Corporal-kinestésica (D)
+      { tipo: 'corporal-kinestésica', texto: 'Tengo buen sentido de equilibrio y coordinación.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Con frecuencia veo configuraciones y relaciones entre números con más rapidez y facilidad que otros.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Me gusta construir modelos (o hacer esculturas).', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lingüística (A)
+      { tipo: 'lingüística', texto: 'Tengo agudeza para encontrar el significado de las palabras.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Puedo mirar un objeto de una manera y con la misma facilidad verlo.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Musical (E)
+      { tipo: 'musical', texto: 'Con frecuencia hago la conexión entre una pieza de música y algún evento de mi vida.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lógico-matemática (B)
+      { tipo: 'lógico-matemática', texto: 'Me gusta trabajar con números y figuras.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Me gusta sentarme silenciosamente y reflexionar sobre mis sentimientos íntimos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Espacial (C)
+      { tipo: 'espacial', texto: 'Con sólo mirar la forma de construcciones y estructuras me siento a gusto.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Musical (E)
+      { tipo: 'musical', texto: 'Me gusta tararear, silbar y cantar en la ducha o cuando estoy sola.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Corporal-kinestésica (D)
+      { tipo: 'corporal-kinestésica', texto: 'Soy bueno(a) para el atletismo.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Lingüística (A)
+      { tipo: 'lingüística', texto: 'Me gusta escribir cartas detalladas a mis amigos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Generalmente me doy cuenta de la expresión que tengo en la cara.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Interpersonal (G)
+      { tipo: 'interpersonal', texto: 'Me doy cuenta de las expresiones en la cara de otras personas.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Me mantengo "en contacto" con mis estados de ánimo. No me cuesta identificarlos.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Interpersonal (G)
+      { tipo: 'interpersonal', texto: 'Me doy cuenta de los estados de ánimo de otros.', opciones: ["Sí", "No"] },
+      
+      // Inteligencia Intrapersonal (F)
+      { tipo: 'intrapersonal', texto: 'Me doy cuenta bastante bien de lo que otros piensan de mí.', opciones: ["Sí", "No"] }
+    ];
+
+    const intelligenceDescriptions = {
+      'lingüística': 'Capacidad para usar palabras de manera efectiva, ya sea oralmente o por escrito. Personas con alta inteligencia lingüística disfrutan de la lectura, escritura y debates.',
+      'lógico-matemática': 'Habilidad para razonar de manera lógica y resolver problemas matemáticos. Personas con esta inteligencia disfrutan de patrones, relaciones y problemas abstractos.',
+      'espacial': 'Capacidad para percibir el mundo visual-espacial de manera precisa y realizar transformaciones. Personas con esta inteligencia tienen buen sentido de orientación y disfrutan de mapas y diseños.',
+      'musical': 'Habilidad para percibir, discriminar, transformar y expresar formas musicales. Personas con esta inteligencia tienen sensibilidad a ritmos, tonos y melodías.',
+      'corporal-kinestésica': 'Habilidad para usar el cuerpo para expresar ideas y sentimientos. Personas con esta inteligencia tienen buena coordinación, equilibrio y destreza manual.',
+      'intrapersonal': 'Habilidad para comprenderse a sí mismo y usar este conocimiento efectivamente. Personas con esta inteligencia tienen autoconciencia de sus emociones y motivaciones.',
+      'interpersonal': 'Capacidad para entender a los demás e interactuar efectivamente con ellos. Personas con esta inteligencia son buenas para percibir estados de ánimo y motivaciones de otros.'
+    };
+
+    const testForm = document.getElementById('testForm');
+
+    preguntas.forEach((pregunta, index) => {
+      const div = document.createElement('div');
+      div.className = 'question';
+      div.innerHTML = `<strong>Pregunta ${index + 1}:</strong> <p>${pregunta.texto}</p>`;
+      pregunta.opciones.forEach((opcion, i) => {
+        const id = `p${index}_o${i}`;
+        div.innerHTML += `
+          <label>
+            <input type="radio" name="p${index}" value="${i === 0 ? 1 : 0}" id="${id}" required>
+            ${opcion}
+          </label>
+        `;
+      });
+      testForm.appendChild(div);
+    });
+
+    function calcularResultados() {
+      const conteo = {};
+      const preguntasPorTipo = {};
+      
+      // Contar cuántas preguntas hay de cada tipo
+      preguntas.forEach(p => {
+        preguntasPorTipo[p.tipo] = (preguntasPorTipo[p.tipo] || 0) + 1;
+      });
+      
+      // Inicializar conteo para cada tipo
+      Object.keys(preguntasPorTipo).forEach(tipo => {
+        conteo[tipo] = 0;
+      });
+      
+      // Sumar las respuestas
+      preguntas.forEach((p, i) => {
+        const valor = document.querySelector(`input[name='p${i}']:checked`);
+        if (valor) {
+          conteo[p.tipo] += parseInt(valor.value);
+        }
+      });
+
+      // Verificar si todas las preguntas fueron respondidas
+      const totalPreguntas = preguntas.length;
+      const preguntasRespondidas = document.querySelectorAll('input[type="radio"]:checked').length;
+      
+      if (preguntasRespondidas < totalPreguntas) {
+        alert('Por favor responde todas las preguntas antes de calcular los resultados.');
+        return;
+      }
+
+      // Preparar datos para gráficos
+      const labels = [];
+      const data = [];
+      const backgroundColors = [];
+      const borderColors = [];
+      
+      const colors = [
+        'rgba(54, 162, 235, 0.7)',  // Azul - Lingüística
+        'rgba(255, 99, 132, 0.7)',   // Rojo - Lógico-matemática
+        'rgba(75, 192, 192, 0.7)',   // Verde - Espacial
+        'rgba(255, 206, 86, 0.7)',   // Amarillo - Musical
+        'rgba(153, 102, 255, 0.7)',  // Morado - Corporal-kinestésica
+        'rgba(255, 159, 64, 0.7)',   // Naranja - Intrapersonal
+        'rgba(83, 102, 255, 0.7)'    // Azul oscuro - Interpersonal
+      ];
+      
+      const border = [
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(83, 102, 255, 1)'
+      ];
+      
+      let colorIndex = 0;
+      for (const [tipo, puntaje] of Object.entries(conteo)) {
+        const maxPuntaje = preguntasPorTipo[tipo];
+        const porcentaje = (puntaje / maxPuntaje) * 100;
+        
+        labels.push(tipo.charAt(0).toUpperCase() + tipo.slice(1));
+        data.push(porcentaje);
+        backgroundColors.push(colors[colorIndex % colors.length]);
+        borderColors.push(border[colorIndex % border.length]);
+        colorIndex++;
+      }
+
+      // Mostrar resultados
+      let resultadoHTML = '<h2>Resultados de tus Inteligencias Múltiples</h2>';
+      
+      for (const [tipo, puntaje] of Object.entries(conteo)) {
+        const maxPuntaje = preguntasPorTipo[tipo];
+        const porcentaje = Math.round((puntaje / maxPuntaje) * 100);
+        
+        resultadoHTML += `
+          <div style="margin-bottom: 20px;">
+            <div class="intelligence-name">${tipo.charAt(0).toUpperCase() + tipo.slice(1)}: ${puntaje}/${maxPuntaje} (${porcentaje}%)</div>
+            <div class="intelligence-description">${intelligenceDescriptions[tipo]}</div>
+            <div style="background: #ccc; border-radius: 8px; overflow: hidden; height: 20px; margin-top: 8px;">
+              <div style="width: ${porcentaje}%; background: ${colors[Object.keys(conteo).indexOf(tipo) % colors.length]}; height: 100%; transition: width 0.4s;"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('results').innerHTML = resultadoHTML;
+      
+      // Crear contenedores para gráficos
+      document.getElementById('charts').innerHTML = `
+        <div class="chart-box">
+          <h3>Distribución de Inteligencias</h3>
+          <canvas id="pieChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Comparación de Inteligencias</h3>
+          <canvas id="barChart"></canvas>
+        </div>
+      `;
+      
+      // Crear gráfico de torta
+      const pieCtx = document.getElementById('pieChart').getContext('2d');
+      new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw.toFixed(1)}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Crear gráfico de barras
+      const barCtx = document.getElementById('barChart').getContext('2d');
+      new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Porcentaje de desarrollo',
+            data: data,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.raw.toFixed(1)}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Desplazarse a los resultados
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
